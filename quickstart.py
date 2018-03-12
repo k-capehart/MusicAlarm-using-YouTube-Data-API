@@ -1,5 +1,4 @@
-# https://www.googleapis.com/youtube/v3/channels?part=contentDetails&forUsername=MUSIC&key=AIzaSyBD9E_U8NozZFvmh9952xHpGS6zhcGsd14
-
+# Sample Python code for user authorization
 
 import os
 
