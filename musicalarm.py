@@ -1,13 +1,7 @@
-# https://www.googleapis.com/youtube/v3/channels?part=contentDetails&forUsername=MUSIC&key=AIzaSyBD9E_U8NozZFvmh9952xHpGS6zhcGsd14
-
-
-import os
-
-import google.oauth2.credentials
+import webbrowser
+import random
 
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from google_auth_oauthlib.flow import InstalledAppFlow
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client import tools
@@ -33,21 +27,26 @@ def get_authenticated_service():
     credentials = tools.run_flow(flow, storage, flags)
   return build(API_SERVICE_NAME, API_VERSION, credentials = credentials)
 
-def channels_list_by_username(service, **kwargs):
-  results = service.channels().list(
-    **kwargs
-  ).execute()
-  
-  print('This channel\'s ID is %s. Its title is %s, and it has %s views.' %
-       (results['items'][0]['id'],
-        results['items'][0]['snippet']['title'],
-        results['items'][0]['statistics']['viewCount']))
+def get_playlist_list(service, **kwargs):
+  list = service.playlists().list(**kwargs).execute()
+  return list
+
+def get_video_id(service, **kwargs):
+  video = service.playlistItems().list(**kwargs).execute()
+  videoId = video['items'][0]['id']
+  return videoId
 
 if __name__ == '__main__':
-  # When running locally, disable OAuthlib's HTTPs verification. When
-  # running in production *do not* leave this option enabled.
-  os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
   service = get_authenticated_service()
-  channels_list_by_username(service,
-      part='snippet,contentDetails,statistics',
-      forUsername='GoogleDevelopers')
+
+  # Returns a list of all playlists for the Music Channel
+  musicId = 'UC-9-kyTW8ZkZNDHQJ6FgpwQ'
+  list = get_playlist_list(service, part = 'snippet, contentDetails', channelId = musicId)
+
+  # Selects a random playlist
+  length = len(list)
+  index = random.randint(0, length)
+  playlistId = list['items'][index]['id']
+
+  videoId = get_video_id(service, part = 'snippet, contentDetails', playlistId = playlistId)
+  webbrowser.open('https://www.youtube.com/watch?v=%s' % videoId)
