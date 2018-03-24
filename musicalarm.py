@@ -33,10 +33,10 @@ def cls():
   os.system('cls' if os.name == 'nt' else 'clear')
 
 def clock():
-  print(strftime("%I:%M %p", localtime()))
-  sleep(.5)
-  cls()
-  clock()
+  while True:
+    print(strftime("%I:%M %p", localtime()))
+    sleep(.5)
+    cls()
 
 def get_authenticated_service():
   flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE, scope=SCOPES)
