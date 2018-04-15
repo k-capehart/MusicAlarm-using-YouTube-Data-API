@@ -1,13 +1,13 @@
 import webbrowser
 import random
 import os
+import gui
 
 from googleapiclient.discovery import build
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client import tools
 from time import localtime, strftime, sleep, strptime
-from threading import Thread
 
 # The CLIENT_SECRETS_FILE contains client_id and client_secret
 CLIENT_SECRETS_FILE = "client_secret.json"
@@ -17,17 +17,6 @@ SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
 musicId = 'UC-9-kyTW8ZkZNDHQJ6FgpwQ'
-
-class ClockUpdater(Thread):
-
-  def __init__(self, clock_func):
-    Thread.__init__(self)
-    self.runnable = clock_func
-
-  def run(self):
-    self.runnable()
-
-# End of Class
 
 def cls():
   os.system('cls' if os.name == 'nt' else 'clear')
@@ -70,20 +59,14 @@ def get_video_id(service, **kwargs):
   videoId = playListItems['items'][index]['contentDetails']['videoId']
   return videoId
 
+def alarm():
+  service = get_authenticated_service()
 
-if __name__ == '__main__':
   my_time = strptime(input("When do you want to wake up? (HH:MM AM/PM)  "), "%I:%M %p")
-
-  # Multithreading
-  thread = ClockUpdater(clock)
-  thread.start()
 
   # Program pauses here until the time is reached
   while(strftime("%I:%M %p", localtime()) != strftime("%I:%M %p", my_time)):
     sleep(.5)
-
-  # Ask for permission to use account
-  service = get_authenticated_service()
 
   # Returns a list of all playlists for the Music Channel and then selects a random video
   playlistId = get_playlist_id(service, part='snippet, contentDetails', channelId=musicId)
@@ -92,5 +75,6 @@ if __name__ == '__main__':
   link = ("https://www.youtube.com/watch?v=%s" % str(videoId))
   webbrowser.open(link)
 
-  # Join the threads
-  thread.join()
+if __name__ == '__main__':
+  # Ask for permission to use account
+  gui.GUI().run()

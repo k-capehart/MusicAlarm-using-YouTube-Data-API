@@ -1,0 +1,19 @@
+<F>:
+	FloatLayout:
+
+		BoxLayout:
+			orientation: 'vertical'
+			size_hint_y: .75
+			Label:
+				text: "Oops"
+				text: app.time
+				font_size: 100
+		
+			BoxLayout:
+				orientation: 'horizontal'
+				size_hint_y: .25
+				TextInput:
+					font_size: 50
+				Button:
+					text: "Set Alarm"
+					on_press: app.alarm()
