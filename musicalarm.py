@@ -19,6 +19,7 @@ SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
 musicId = 'UC-9-kyTW8ZkZNDHQJ6FgpwQ'
+func = None
 
 def get_authenticated_service():
   flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE, scope=SCOPES)
@@ -53,11 +54,14 @@ def get_video_id(service, **kwargs):
   return videoId
 
 def set_alarm(input):  
+  global func
   my_time = input;
+  func = partial(check_timer, my_time)
 
-  Clock.schedule_once(partial(check_timer, my_time), .5)
+  Clock.schedule_interval(func, .5)
 
 def check_timer(my_time, *args):
+  global func
   # Ask for permission to use account
   service = get_authenticated_service()
 
@@ -65,6 +69,8 @@ def check_timer(my_time, *args):
   if(strftime("%I:%M %p", localtime()) == strftime("%I:%M %p", my_time)):
     playlistId = get_playlist_id(service, part='snippet, contentDetails', channelId=musicId)
     videoId = get_video_id(service, part='snippet, contentDetails', playlistId=playlistId)
+
+    Clock.unschedule(func, .5)
 
     link = ("https://www.youtube.com/watch?v=%s" % str(videoId))
     webbrowser.open(link)
